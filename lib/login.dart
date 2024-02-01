@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:login_page/signup.dart';
+import 'package:firebase_core/firebase_core.dart';
 
+import 'firebase_auth_services.dart';
+import 'information.dart';
 class login_page extends StatefulWidget {
   const login_page({super.key});
 
@@ -13,12 +17,22 @@ class _login_pageState extends State<login_page> {
   final String _subtitle = "Login into your account";
   final String _login = "Sign in";
   final String _account = "Don't have an account ?";
+  TextEditingController _username = TextEditingController();
+  TextEditingController _password = TextEditingController();
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+
+  void dispose(){
+    _username.dispose();
+    _password.dispose();
+        super.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
-      appBar: AppBar(),
+      appBar: AppBar( automaticallyImplyLeading: false,),
       body: Column(
             children: [
               Text(_title, style: Theme.of(context).textTheme.headlineMedium),
@@ -68,6 +82,7 @@ class _login_pageState extends State<login_page> {
                               title: "E-mail",
                               icon: Icon(Icons.email),
                               obscureText: false,
+                              control: _username,
                             ),
                             SizedBox(
                               height: 40,
@@ -76,12 +91,13 @@ class _login_pageState extends State<login_page> {
                               title: "Password",
                               icon: Icon(Icons.password),
                               obscureText: true,
+                              control: _password,
                             ),
                             SizedBox(
                               height: 20,
                             ),
                             ElevatedButton(
-                              onPressed: () {},
+                              onPressed: _singIn,
                               child: Center(
                                 child: Text(
                                   "Login",
@@ -125,6 +141,18 @@ class _login_pageState extends State<login_page> {
 
     );
   }
+  void _singIn() async{
+    String username=_username.text;
+    String password=_password.text;
+    User? user=await _auth.signInWithEmailAndPassword(username, password);
+    if(user!=null){
+      print("Sign up successful");
+      Navigator.push(context, MaterialPageRoute(builder: (context)=>information()));
+    }
+    else{
+      print("Sign up failed");
+    }
+  }
 }
 
 class input extends StatelessWidget {
@@ -132,13 +160,16 @@ class input extends StatelessWidget {
       {super.key,
       required this.title,
       required this.icon,
-      required this.obscureText});
+      required this.obscureText,
+      required this.control});
   final String title;
-  final Widget icon;
+  final Icon icon;
   final bool obscureText;
+  final TextEditingController control;
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: control,
       obscureText: obscureText,
       decoration: InputDecoration(
           border: OutlineInputBorder(), labelText: title, prefixIcon: icon),

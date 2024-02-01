@@ -1,4 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_auth_services.dart';
+import 'login.dart';
 
 class signup extends StatefulWidget {
   const signup({super.key});
@@ -13,13 +17,16 @@ class _signupState extends State<signup> {
   final String _sign = "Signup";
 
 
-  final _Email = TextEditingController();
-  final _Password = TextEditingController();
+  final TextEditingController _Email = TextEditingController();
+  final TextEditingController _Password = TextEditingController();
+
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
 
   @override
   void dispose() {
     _Email.dispose();
     _Password.dispose();
+    super.dispose();
   }
 
 
@@ -87,10 +94,10 @@ class _signupState extends State<signup> {
                           height: 20,
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed:_signUp,
                           child: Center(
                             child: Text(
-                              "Register",
+                              "Sign Up",
                               style: TextStyle(color: Colors.white),
                             ),
                           ),
@@ -110,7 +117,20 @@ class _signupState extends State<signup> {
 
     );
   }
+  void _signUp() async{
+    String username=_Email.text;
+    String password=_Password.text;
+    User? user=await _auth.signUpWithEmailAndPassword(username, password);
+    if(user!=null){
+      print("Sign up successful");
+       Navigator.push(context, MaterialPageRoute(builder: (context)=>login_page()));
+    }
+    else{
+      print("Sign up failed");
+    }
+  }
 }
+
 
 class input extends StatelessWidget {
   const input(
