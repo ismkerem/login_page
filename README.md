@@ -1,6 +1,6 @@
 # login_page
 
-A new Flutter project.
+In this project, this is the login page made using Firebase for devices running Android devices.
 
 ## Getting Started
 
